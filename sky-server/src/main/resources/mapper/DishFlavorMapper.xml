@@ -6,8 +6,15 @@
 
     <insert id="insertBatch">
         insert into dish_flavor(dish_id, name, value) VALUES
-         <foreach collection="flavors" item="flavor" separator=",">
-             (#{flavor.dishId},#{flavor.name},#{flavor.value})
-         </foreach>
+        <foreach collection="flavors" item="flavor" separator=",">
+            (#{flavor.dishId},#{flavor.name},#{flavor.value})
+        </foreach>
     </insert>
+
+    <delete id="deleteBatchByDishIds">
+        delete from dish_flavor where dish_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
