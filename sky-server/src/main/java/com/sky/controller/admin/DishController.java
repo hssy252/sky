@@ -10,7 +10,9 @@ import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,9 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 菜品上传
      */
@@ -45,6 +50,9 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
 
         dishService.saveWithFlavor(dishDTO);
+        //更新缓存
+        cleanCache("dish_" + dishDTO.getCategoryId());
+
         return Result.success();
     }
 
@@ -63,8 +71,11 @@ public class DishController {
 
     @PostMapping("/status/{status}")
     @ApiOperation("启用或禁用菜品")
-    public Result<String>  startOrStop(@PathVariable("status") Integer status,Long id ){
-        dishService.startOrStop(status,id);
+    public Result<String> startOrStop(@PathVariable("status") Integer status, Long id) {
+        dishService.startOrStop(status, id);
+
+        cleanCache("dish_*");
+
         return Result.success();
 
     }
@@ -74,6 +85,10 @@ public class DishController {
     @DeleteMapping
     public Result delete(@RequestParam List<Long> ids) {
         dishService.deleteBatch(ids);
+
+        //更新缓存
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -88,6 +103,12 @@ public class DishController {
     @PutMapping
     public Result update(@RequestBody DishDTO dishDTO) {
         dishService.updateWithFlavor(dishDTO);
+
+        //更新缓存
+//        Set keys = redisTemplate.keys("dish_*");
+//        redisTemplate.delete(keys);
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -105,5 +126,14 @@ public class DishController {
         return Result.success(list);
     }
 
+    /**
+     * 清流redis缓存
+     *
+     * @param pattern
+     */
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
+    }
 
 }
