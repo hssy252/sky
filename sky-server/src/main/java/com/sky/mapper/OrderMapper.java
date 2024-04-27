@@ -1,11 +1,16 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.LocalDateTime2TurpleDTO;
+import com.sky.dto.OrderAmount;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -42,9 +47,9 @@ public interface OrderMapper {
     @Select("select * from orders where status=#{status} and order_time<#{orderTime}")
     List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime orderTime);
 
-    void updateTimeOutByIds(Integer payStatus,String cancelReason,LocalDateTime cancelTime,List<Long> ids);
+    void updateTimeOutByIds(Integer status,String cancelReason,LocalDateTime cancelTime,List<Long> ids);
 
-    void updateDeliveringByIds(Integer payStatus, List<Long> ids);
+    void updateDeliveringByIds(Integer status, List<Long> ids);
 
     /**
      * 分页条件查询并按下单时间排序
@@ -66,4 +71,14 @@ public interface OrderMapper {
     @Select("select count(id) from orders where status = #{status}")
     Integer countStatus(Integer status);
 
+
+    Double sumByMap(HashMap<String, Object> map);
+
+    List<OrderAmount> countSumByDay(List<LocalDateTime2TurpleDTO> dateList);
+
+    List<Integer> countOrderNumByDay(List<LocalDateTime2TurpleDTO> dateList);
+
+    List<Integer> sumValidNumByDay(List<LocalDateTime2TurpleDTO> dateList);
+
+    Integer countOrderNumByMap(Map<String, Object> map);
 }

@@ -9,4 +9,14 @@
             (#{od.name},#{od.image},#{od.orderId} ,#{od.dishId},#{od.setmealId},#{od.dishFlavor},#{od.number},#{od.amount})
         </foreach>
     </insert>
+    <select id="countTopTenByTimeSpan" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name ,sum(od.number) number
+        from order_detail od
+                 left join orders o on od.order_id = o.id
+        where o.status = 5 and o.order_time &gt; #{begin} and o.order_time &lt; #{end}
+        group by od.name
+        order by number desc
+        limit 0,10
+    </select>
+
 </mapper>

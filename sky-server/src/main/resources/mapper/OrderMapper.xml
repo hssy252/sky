@@ -78,9 +78,53 @@
         </where>
         order by order_time desc
     </select>
-    <resultMap id="OrderVoMap" type="com.sky.vo.OrderVO">
+    <select id="sumByMap" resultType="java.lang.Double">
+        select sum(amount) from orders
+        <where>
+            <if test="beginTime!=null">
+                and order_time &gt; #{beginTime}
+            </if>
+            <if test="endTime!=null">
+                and order_time &lt; #{endTime}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
 
-    </resultMap>
+    </select>
+
+
+
+    <select id="countSumByDay" resultType="com.sky.dto.OrderAmount">
+        <foreach collection="dateList" item="date" separator="union all">
+            select sum(amount) as sum from orders where order_time &gt; #{date.begin} and order_time &lt; #{date.end} and status = 5
+        </foreach>
+    </select>
+    <select id="countOrderNumByMap" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="beginTime!=null">
+                and order_time &gt; #{begin}
+            </if>
+            <if test="endTime!=null">
+                and order_time &lt; #{end}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="countOrderNumByDay" resultType="java.lang.Integer">
+        <foreach collection="dateList" item="date" separator="union all">
+            select count(id) from  orders where order_time &gt; #{date.begin} and order_time &lt; #{date.end}
+        </foreach>
+    </select>
+    <select id="sumValidNumByDay" resultType="java.lang.Integer">
+        <foreach collection="dateList" item="date" separator="union all">
+            select count(id) from  orders where order_time &gt; #{date.begin} and order_time &lt; #{date.end} and status = 5
+        </foreach>
+    </select>
 
 
 </mapper>
