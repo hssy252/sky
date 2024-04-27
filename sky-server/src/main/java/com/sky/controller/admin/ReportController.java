@@ -9,6 +9,7 @@ import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.time.LocalDate;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,6 +85,15 @@ public class ReportController {
         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
         return Result.success(reportService.getTopTenStatistics(begin,end));
+    }
+
+    /**
+     * 导出近三十天运营数据
+     */
+    @GetMapping("/export")
+    @ApiOperation("导出数据")
+    public void export(HttpServletResponse response){
+        reportService.exportBusinessData(response);
     }
 
 }

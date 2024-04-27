@@ -102,7 +102,7 @@
         </foreach>
     </select>
     <select id="countOrderNumByMap" resultType="java.lang.Integer">
-        select count(id) from user
+        select count(id) from orders
         <where>
             <if test="beginTime!=null">
                 and order_time &gt; #{begin}
